@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+systemctl --user daemon-reload
+systemctl --user start deckard
+sleep 2
+systemctl --user status deckard
+

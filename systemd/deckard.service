@@ -1,0 +1,9 @@
+[Unit]
+Description=Machine Head Discord Bot 
+
+[Service]
+Type=simple
+ExecStart=/var/home/strat/bin/deckard
+
+[Install]
+WantedBy=default.target

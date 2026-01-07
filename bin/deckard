@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+cd /home/strat/proj/deckard/ || return 1
+bin/bot
+
