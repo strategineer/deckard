@@ -35,9 +35,10 @@ async def on_message(message):
     if message.content.startswith(ROLL_COMMAND):
         try:
             roll_cmd = message.content[len(ROLL_COMMAND):]
-            result = dice.roll(roll_cmd)
+            roll = dice.roll(roll_cmd, raw=True)
+            result = dice.utilities.verbose_print(roll)
         except:
             await message.channel.send('Rolls should be formatted like so: "$roll 2d6 + 1d100 + 69"')
-        await message.channel.send(f'{roll_cmd}: {result}')
+        await message.channel.send(result)
 
 client.run(BOT_TOKEN)
