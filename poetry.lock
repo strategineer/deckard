@@ -241,6 +241,21 @@ files = [
 ]
 
 [[package]]
+name = "dice"
+version = "4.0.0"
+description = "A library for parsing and evaluating dice notation"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "dice-4.0.0-py3-none-any.whl", hash = "sha256:59aa1f7b23846b32a618697534429fec80be3a1087b4f934022dcdb99cf1417f"},
+    {file = "dice-4.0.0.tar.gz", hash = "sha256:7a1bfd68f21abf245f333de89721cd30379b5413c774a9d34a6b4123c526815c"},
+]
+
+[package.dependencies]
+pyparsing = ">=2.4.1"
+
+[[package]]
 name = "discord-py"
 version = "2.6.4"
 description = "A Python wrapper for the Discord API"
@@ -707,6 +722,21 @@ files = [
 ]
 
 [[package]]
+name = "pyparsing"
+version = "3.3.1"
+description = "pyparsing - Classes and methods to define and execute parsing grammars"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "pyparsing-3.3.1-py3-none-any.whl", hash = "sha256:023b5e7e5520ad96642e2c6db4cb683d3970bd640cdf7115049a6e9c3682df82"},
+    {file = "pyparsing-3.3.1.tar.gz", hash = "sha256:47fad0f17ac1e2cad3de3b458570fbc9b03560aa029ed5e16ee5554da9a2251c"},
+]
+
+[package.extras]
+diagrams = ["jinja2", "railroad-diagrams"]
+
+[[package]]
 name = "yarl"
 version = "1.22.0"
 description = "Yet another URL library"
@@ -854,4 +884,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14"
-content-hash = "3417c45ca55ee5dab91dc0eae4599e941de74ad8f02ec7641c08479044bd6bd8"
+content-hash = "f307bdf35f3f93912538dd72923478067b1c0a5c40ccf7cfc9cffc543e81c56e"
