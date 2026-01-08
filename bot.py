@@ -76,7 +76,7 @@ async def book(ctx):
         with sqlite3.connect(DB_PATH) as con:
             cur = con.cursor()
             # TODO only show rows after today, inclusive
-            res = cur.execute("SELECT date(date), name from book order by date").fetchall()
+            res = cur.execute("SELECT date(date), name FROM book ORDER BY date").fetchall()
             if res:
                 await ctx.send(pprint.pformat(res))
             else:
@@ -87,7 +87,7 @@ async def idea(ctx):
     if ctx.invoked_subcommand is None:
         with sqlite3.connect(DB_PATH) as con:
             cur = con.cursor()
-            res = cur.execute("SELECT date, name from bookidea order by date").fetchall()
+            res = cur.execute("SELECT date, name FROM bookidea ORDER BY date DESC").fetchall()
             if res:
                 await ctx.send(pprint.pformat(res))
             else:
