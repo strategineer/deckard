@@ -95,6 +95,9 @@ async def idea(ctx):
 
 @idea.command()
 async def add(ctx, idea_name):
+    if str(ctx.author.id) != ADMIN_ID:
+        await ctx.send("You're not an admin!")
+        return
     with sqlite3.connect(DB_PATH) as con:
         cur = con.cursor()
         data = (
