@@ -3,7 +3,7 @@ Description=Machine Head Discord Bot
 
 [Service]
 Type=simple
-ExecStartPre=/bin/sleep 5
+ExecStartPre=/bin/sleep 15
 ExecStart=/var/home/strat/bin/deckard
 
 [Install]
