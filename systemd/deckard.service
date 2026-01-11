@@ -5,6 +5,9 @@ Description=Machine Head Discord Bot
 Type=simple
 ExecStartPre=/bin/sleep 15
 ExecStart=/var/home/strat/bin/deckard
+Restart=on-failure
+StandardOutput=append:/home/strat/log/deckard.log
+StandardError=append:/home/strat/log/deckard.log
 
 [Install]
 WantedBy=default.target
