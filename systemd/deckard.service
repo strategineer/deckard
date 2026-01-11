@@ -6,8 +6,7 @@ Type=simple
 ExecStartPre=/bin/sleep 15
 ExecStart=/var/home/strat/bin/deckard
 Restart=on-failure
-StandardOutput=append:/home/strat/log/deckard.log
-StandardError=append:/home/strat/log/deckard.log
+RestartSec=5s
 
 [Install]
 WantedBy=default.target
