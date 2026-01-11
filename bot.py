@@ -8,6 +8,14 @@ import dice
 import discord
 from discord.ext import commands
 
+WEEKDAY_WEDNESDAY = 2
+
+def format_book(date, name):
+    return f"{datetime.date.fromisoformat(date).strftime('%a %d %b %Y')}\n\t{name}"
+
+def format_books(books):
+    return "\n".join(books)
+
 def adapt_date_iso(val):
     """Adapt datetime.date to ISO 8601 date."""
     return val.isoformat()
@@ -75,10 +83,9 @@ async def book(ctx):
     if ctx.invoked_subcommand is None:
         with sqlite3.connect(DB_PATH) as con:
             cur = con.cursor()
-            # TODO only show rows after today, inclusive
-            res = cur.execute("SELECT date(date), name FROM book ORDER BY date").fetchall()
+            res = cur.execute("SELECT date, name FROM book WHERE date >= ? ORDER BY date", [datetime.date.today()]).fetchall()
             if res:
-                await ctx.send(pprint.pformat(res))
+                await ctx.send(format_books(format_book(date, name) for date, name in res))
             else:
                 await ctx.send("No BookTalk books planned yet... :(")
 
@@ -89,7 +96,7 @@ async def idea(ctx):
             cur = con.cursor()
             res = cur.execute("SELECT date, name FROM bookidea ORDER BY date DESC").fetchall()
             if res:
-                await ctx.send(pprint.pformat(res))
+                await ctx.send(format_books(format_book(date, name) for date, name in res))
             else:
                 await ctx.send("No BookTalk book ideas planned yet... :(")
 
@@ -110,9 +117,20 @@ async def add(ctx, idea_name):
 async def next(ctx):
     with sqlite3.connect(DB_PATH) as con:
         cur = con.cursor()
-        res = cur.execute("SELECT name from book order by date LIMIT 1").fetchall()
+        res = cur.execute("SELECT date, name FROM book WHERE date >= ? ORDER BY date LIMIT 1", [datetime.date.today()]).fetchone()
         if res:
-            await ctx.send(pprint.pformat(res))
+            date, name = res
+            await ctx.send(format_book(date, name))
+        else:
+            await ctx.send("No BookTalk books planned yet... :(")
+
+@book.command()
+async def all(ctx):
+    with sqlite3.connect(DB_PATH) as con:
+        cur = con.cursor()
+        res = cur.execute("SELECT date, name FROM book ORDER BY date DESC").fetchall()
+        if res:
+            await ctx.send(format_books(format_book(date, name) for date, name in res))
         else:
             await ctx.send("No BookTalk books planned yet... :(")
 
@@ -127,12 +145,9 @@ async def add(ctx, book_name, n_weeks_from_now: int):
     if str(ctx.author.id) != ADMIN_ID:
         await ctx.send("You're not an admin!")
         return
-    if n_weeks_from_now < 0:
-        await ctx.send(f"n_weeks_from_now should be more than 0")
-        return
 
     # Get next wednesday
-    scheduled_day = next_weekday(datetime.date.today(), 2, n_weeks_from_now)
+    scheduled_day = next_weekday(datetime.date.today(), WEEKDAY_WEDNESDAY, n_weeks_from_now)
     with sqlite3.connect(DB_PATH) as con:
         cur = con.cursor()
         data = (
@@ -142,16 +157,13 @@ async def add(ctx, book_name, n_weeks_from_now: int):
         await ctx.send("Book added")
 
 @book.command()
-async def edit(ctx, book_name, n_weeks_from_now: int, ):
+async def edit(ctx, book_name, n_weeks_from_now: int):
     if str(ctx.author.id) != ADMIN_ID:
         await ctx.send("You're not an admin!")
         return
-    if n_weeks_from_now < 0:
-        await ctx.send(f"n_weeks_from_now should be more than 0")
-        return
 
     # Get next wednesday
-    scheduled_day = next_weekday(datetime.date.today(), 2, n_weeks_from_now)
+    scheduled_day = next_weekday(datetime.date.today(), WEEKDAY_WEDNESDAY, n_weeks_from_now)
     with sqlite3.connect(DB_PATH) as con:
         cur = con.cursor()
         data = (

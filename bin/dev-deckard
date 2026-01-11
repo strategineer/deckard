@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+eza bot.py | entr -r bin/deckard
