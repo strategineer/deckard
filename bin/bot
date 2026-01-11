@@ -1,2 +1,0 @@
-#!/usr/bin/fish
-poetry run python3 bot.py

@@ -1,4 +1,2 @@
-#!/usr/bin/bash
-cd /home/strat/proj/deckard/ || return 1
-bin/bot
-
+#!/usr/bin/fish
+poetry run python3 bot.py

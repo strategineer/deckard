@@ -3,8 +3,9 @@ Description=Machine Head Discord Bot
 
 [Service]
 Type=simple
+WorkingDirectory=/home/strat/proj/deckard
 ExecStartPre=/bin/sleep 15
-ExecStart=/var/home/strat/bin/deckard
+ExecStart=/home/strat/proj/deckard/bin/deckard
 Restart=on-failure
 RestartSec=5s
 
