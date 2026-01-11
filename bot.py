@@ -93,7 +93,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="$", intents=intents)
 
 
-@bot.command()
+@bot.command(help="Roll dice / do math: '$roll 2d6 + 1d100 + 69'.")
 async def roll(ctx, *args):
     arguments = ", ".join(args)
     try:
@@ -105,7 +105,7 @@ async def roll(ctx, *args):
     await ctx.send(result)
 
 
-@bot.group()
+@bot.group(help="Monday Movie Night commands.")
 async def movie(ctx):
     if ctx.invoked_subcommand is None:
         await ctx.send(
@@ -113,7 +113,7 @@ async def movie(ctx):
         )
 
 
-@movie.command()
+@movie.command(help="Find movie nights presented by X.")
 async def by(ctx, username):
     movie_nights = filter_movie_nights(ctx, username)
     if not len(movie_nights):
@@ -122,7 +122,7 @@ async def by(ctx, username):
     await ctx.send(format_lines((format_movie_night(e) for e in movie_nights)))
 
 
-@movie.command()
+@movie.command(help="Find next movie night.")
 async def next(ctx):
     movie_nights = filter_movie_nights(ctx)
     if not len(movie_nights):
@@ -131,7 +131,7 @@ async def next(ctx):
     await ctx.send(format_movie_night(movie_nights[0]))
 
 
-@bot.group()
+@bot.group(help="Book Talk commands.")
 async def book(ctx):
     if ctx.invoked_subcommand is None:
         with sqlite3.connect(DB_PATH) as con:
@@ -148,7 +148,7 @@ async def book(ctx):
             await ctx.send("No BookTalk books planned yet... :(")
 
 
-@book.group()
+@book.group(help="Book Talk ideas commands.")
 async def idea(ctx):
     if ctx.invoked_subcommand is None:
         with sqlite3.connect(DB_PATH) as con:
@@ -164,7 +164,7 @@ async def idea(ctx):
             await ctx.send("No BookTalk book ideas planned yet... :(")
 
 
-@idea.command()
+@idea.command(help="Add an idea for a future Book Talk.")
 async def add(ctx, idea_name):
     if str(ctx.author.id) != ADMIN_ID:
         await ctx.send("You're not an admin!")
@@ -176,7 +176,7 @@ async def add(ctx, idea_name):
         await ctx.send("Book idea added")
 
 
-@book.command()
+@book.command(help="Find the next Book Talk book and date.")
 async def next(ctx):
     with sqlite3.connect(DB_PATH) as con:
         cur = con.cursor()
@@ -191,7 +191,7 @@ async def next(ctx):
         await ctx.send("No BookTalk books planned yet... :(")
 
 
-@book.command()
+@book.command(help="Get all the Book Talks, past and future.")
 async def all(ctx):
     with sqlite3.connect(DB_PATH) as con:
         cur = con.cursor()
@@ -209,7 +209,7 @@ def next_weekday(d, weekday, n_weeks):
     return d + datetime.timedelta(days_ahead) + datetime.timedelta(days=7 * n_weeks)
 
 
-@book.command()
+@book.command(help="Add a new Book Talk.")
 async def add(ctx, book_name, n_weeks_from_now: int):
     if str(ctx.author.id) != ADMIN_ID:
         await ctx.send("You're not an admin!")
@@ -226,7 +226,7 @@ async def add(ctx, book_name, n_weeks_from_now: int):
         await ctx.send("Book added")
 
 
-@book.command()
+@book.command(help="Edit an existing Book Talk.")
 async def edit(ctx, book_name, n_weeks_from_now: int):
     if str(ctx.author.id) != ADMIN_ID:
         await ctx.send("You're not an admin!")
@@ -243,7 +243,7 @@ async def edit(ctx, book_name, n_weeks_from_now: int):
         await ctx.send("Book edited")
 
 
-@book.command()
+@book.command(hidden=True)
 async def db_init(ctx):
     if str(ctx.author.id) != ADMIN_ID:
         await ctx.send("You're not an admin!")
@@ -255,7 +255,7 @@ async def db_init(ctx):
     await ctx.send("Books table init-ed")
 
 
-@book.command()
+@book.command(hidden=True)
 async def db_reset(ctx):
     if str(ctx.author.id) != ADMIN_ID:
         await ctx.send("You're not an admin!")
