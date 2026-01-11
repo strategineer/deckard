@@ -1,19 +1,26 @@
 import configparser
 import datetime
-import pprint
-import sys
 import sqlite3
+import sys
+import re
 
 import dice
 import discord
 from discord.ext import commands
 
 WEEKDAY_WEDNESDAY = 2
+DATE_FORMAT = '%a %d %b %Y'
+
+def filter_movie_nights(ctx, username = None):
+    return [e for e in ctx.guild.scheduled_events if re.search("Movie", e.name, re.IGNORECASE) and (username is None or re.search(username, e.name, re.IGNORECASE))]
+
+def format_movie_night(e):
+    return f"{e.start_time.strftime(DATE_FORMAT)}\n\t{e.name}"
 
 def format_book(date, name):
-    return f"{datetime.date.fromisoformat(date).strftime('%a %d %b %Y')}\n\t{name}"
+    return f"{datetime.date.fromisoformat(date).strftime(DATE_FORMAT)}\n\t{name}"
 
-def format_books(books):
+def format_lines(books):
     return "\n".join(books)
 
 def adapt_date_iso(val):
@@ -79,15 +86,36 @@ async def roll(ctx, *args):
     await ctx.send(result)
 
 @bot.group()
+async def movie(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send(format_lines(format_movie_night(e) for e in filter_movie_nights(ctx)))
+
+@movie.command()
+async def by(ctx, username):
+    movie_nights = filter_movie_nights(ctx, username)
+    if not len(movie_nights):
+        await ctx.send(f"No movie night planned by {username}...")
+        return
+    await ctx.send(format_lines((format_movie_night(e) for e in movie_nights)))
+
+@movie.command()
+async def next(ctx):
+    movie_nights = filter_movie_nights(ctx)
+    if not len(movie_nights):
+        await ctx.send("No movie nights planned...")
+        return
+    await ctx.send(format_movie_night(movie_nights[0]))
+
+@bot.group()
 async def book(ctx):
     if ctx.invoked_subcommand is None:
         with sqlite3.connect(DB_PATH) as con:
             cur = con.cursor()
             res = cur.execute("SELECT date, name FROM book WHERE date >= ? ORDER BY date", [datetime.date.today()]).fetchall()
             if res:
-                await ctx.send(format_books(format_book(date, name) for date, name in res))
-            else:
-                await ctx.send("No BookTalk books planned yet... :(")
+                await ctx.send(format_lines(format_book(date, name) for date, name in res))
+                return
+            await ctx.send("No BookTalk books planned yet... :(")
 
 @book.group()
 async def idea(ctx):
@@ -96,9 +124,9 @@ async def idea(ctx):
             cur = con.cursor()
             res = cur.execute("SELECT date, name FROM bookidea ORDER BY date DESC").fetchall()
             if res:
-                await ctx.send(format_books(format_book(date, name) for date, name in res))
-            else:
-                await ctx.send("No BookTalk book ideas planned yet... :(")
+                await ctx.send(format_lines(format_book(date, name) for date, name in res))
+                return
+            await ctx.send("No BookTalk book ideas planned yet... :(")
 
 @idea.command()
 async def add(ctx, idea_name):
@@ -121,8 +149,8 @@ async def next(ctx):
         if res:
             date, name = res
             await ctx.send(format_book(date, name))
-        else:
-            await ctx.send("No BookTalk books planned yet... :(")
+            return
+        await ctx.send("No BookTalk books planned yet... :(")
 
 @book.command()
 async def all(ctx):
@@ -130,9 +158,9 @@ async def all(ctx):
         cur = con.cursor()
         res = cur.execute("SELECT date, name FROM book ORDER BY date DESC").fetchall()
         if res:
-            await ctx.send(format_books(format_book(date, name) for date, name in res))
-        else:
-            await ctx.send("No BookTalk books planned yet... :(")
+            await ctx.send(format_lines(format_book(date, name) for date, name in res))
+            return
+        await ctx.send("No BookTalk books planned yet... :(")
 
 def next_weekday(d, weekday, n_weeks):
     days_ahead = weekday - d.weekday()
