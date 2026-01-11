@@ -1,5 +1,4 @@
 #!/usr/bin/bash
-systemctl --user stop deckard
 systemctl --user daemon-reload
 systemctl --user start deckard
 sleep 2
